@@ -25,4 +25,5 @@ urlpatterns = [
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
     path('api/auth/google/', include('allauth.socialaccount.urls')),
     path('api/profile/', ProfileAPIView.as_view()),
+    path('api/chat/', include('chat.urls')),
 ]

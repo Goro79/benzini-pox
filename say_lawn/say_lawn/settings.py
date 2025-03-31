@@ -15,6 +15,17 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+INSTALLED_APPS = [
+    'channels',
+    'chat',
+]
+
+ASGI_APPLICATION = 'say_lawn.asgi.application'
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -46,6 +57,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'accounts',
+    'chat.apps.ChatConfig',
 ]
 
 # Auth settings
@@ -55,9 +67,36 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 SITE_ID = 1
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # Enforce email verification
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# Authentication Settings
+AUTH_USER_MODEL = 'accounts.User'
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+# Allauth Minimal Configuration
+# Allauth Settings (Updated)
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = 'email'  # This is now deprecated but kept for backward compatibility
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# New recommended way to configure these settings
+ACCOUNT_LOGIN_METHODS = ['email']  # Replacement for ACCOUNT_AUTHENTICATION_METHOD
+ACCOUNT_SIGNUP_FIELDS = [  # Replacement for the deprecated fields
+    {
+        'name': 'email',
+        'required': True,
+        'label': 'Email',
+        'type': 'email'
+    }
+]
+# Email verification required since we have mandatory verification
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+
+# Email Settings (Example using console backend)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # For development
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -66,9 +105,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'hamletbrutyan@gmail.com'
 EMAIL_HOST_PASSWORD = 'agoj pnkr lvev jrxk'  # Use App Password, not regular password
 
-AWS_ACCESS_KEY_ID = 'YOUR_KEY'
-AWS_SECRET_ACCESS_KEY = 'YOUR_SECRET'
-AWS_STORAGE_BUCKET_NAME = 'your-bucket'
+AWS_ACCESS_KEY_ID = 'KEY'
+AWS_SECRET_ACCESS_KEY = 'SECRET'
+AWS_STORAGE_BUCKET_NAME = 'bucket'
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 # DRF settings
@@ -77,8 +116,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ]
 }
-
-AUTH_USER_MODEL = 'accounts.User'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
