@@ -1,56 +1,56 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from channels.db import database_sync_to_async
-from django.contrib.auth.models import User
-from .models import ChatRoom, Message  # if you have these models
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # For dynamic rooms, get 'room_id' from the URL
+        # Get room id from URL kwargs and create a group name
         self.room_id = self.scope['url_route']['kwargs']['room_id']
         self.room_group_name = f"chat_{self.room_id}"
 
-        # (Optional) You could verify that the room exists in the database
-        # or create it automatically if needed.
+        # Set default display name (for anonymous users, you may update this later)
+        self.nickname = "Anonymous"
 
-        # If authentication is required, you might also check here:
-        if self.scope["user"].is_anonymous:
-            await self.close()
-        else:
-            # Join the channel group
-            await self.channel_layer.group_add(
-                self.room_group_name,
-                self.channel_name
-            )
-            await self.accept()
+        # If user is authenticated, you might check a property to differentiate role:
+        if self.scope.get("user") and self.scope["user"].is_authenticated:
+            # Check if the user is an employee (assuming your User model has 'is_employee')
+            if getattr(self.scope["user"], "is_employee", False):
+                self.nickname = f"Employee: {self.scope['user'].username}"
+            else:
+                self.nickname = f"Customer: {self.scope['user'].username}"
+
+        # Join the group
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        await self.accept()
+        print(f"Connected {self.channel_name} as {self.nickname} in group {self.room_group_name}")
 
     async def disconnect(self, close_code):
         # Leave the group
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        print(f"Disconnected {self.channel_name} from group {self.room_group_name}")
 
     async def receive(self, text_data):
         data = json.loads(text_data)
-        message_content = data.get('message', '')
-
-        # (Optional) Save the message to the database using database_sync_to_async
+        message = data.get("message", "")
+        # Optionally, update nickname if the client sends one
+        if data.get("nickname"):
+            self.nickname = data["nickname"]
 
         # Broadcast the message to the group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
-                'type': 'chat_message',
-                'message': message_content,
-                'sender_id': self.scope["user"].id,
+                "type": "chat_message",  # This calls the chat_message handler below
+                "message": message,
+                "sender": self.nickname,  # Use the friendly nickname
             }
         )
+        print(f"Broadcasting message from {self.nickname}: {message}")
 
     async def chat_message(self, event):
-        message_content = event['message']
-        sender_id = event.get('sender_id')
+        # Handler called when a message is broadcast to the group
+        message = event["message"]
+        sender = event["sender"]
         await self.send(text_data=json.dumps({
-            'message': message_content,
-            'sender_id': sender_id,
+            "message": message,
+            "sender": sender,
         }))

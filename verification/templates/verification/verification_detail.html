@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Verification Detail</title>
+    <style>
+      body { font-family: Arial, sans-serif; background: #f7f7f7; padding: 20px; }
+      #detail-container { max-width: 600px; margin: auto; background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+      img { max-width: 100%; }
+    </style>
+</head>
+<body>
+  <div id="detail-container">
+    <h1>Verification Detail for {{ verification.user.username }}</h1>
+    <p>Status: {% if verification.verified %} Verified {% else %} Pending {% endif %}</p>
+    <h2>Face Photo</h2>
+    {% if verification.face_photo %}
+      <img src="{{ verification.face_photo.url }}" alt="Face Photo">
+    {% else %}
+      <p>No face photo uploaded.</p>
+    {% endif %}
+    <h2>Passport Photo</h2>
+    {% if verification.passport_photo %}
+      <img src="{{ verification.passport_photo.url }}" alt="Passport Photo">
+    {% else %}
+      <p>No passport photo uploaded.</p>
+    {% endif %}
+    <h2>Permit File</h2>
+    {% if verification.permit_file %}
+      <a href="{{ verification.permit_file.url }}" target="_blank">View Permit</a>
+    {% else %}
+      <p>No permit file uploaded.</p>
+    {% endif %}
+  </div>
+</body>
+</html>
