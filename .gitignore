@@ -1,0 +1,30 @@
+# Python bytecode files
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environment folder (adjust if your env folder is named differently)
+venv/
+env/
+
+# Django stuff:
+*.log
+local_settings.py
+
+# Database file (if using SQLite)
+db.sqlite3
+
+# Static files (if collected to a folder)
+staticfiles/
+
+# Media files (if uploaded by users)
+media/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.vscode/
+*.swp
+

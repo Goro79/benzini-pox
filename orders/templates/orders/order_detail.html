@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Order Detail</title>
+</head>
+<body>
+    <h1>Order Detail</h1>
+    <p><strong>Order ID:</strong> {{ order.id }}</p>
+    <p><strong>Customer:</strong> {{ order.customer.username }}</p>
+    <p><strong>Order Type:</strong> {{ order.get_order_type_display }}</p>
+    <p><strong>Status:</strong> {{ order.status }}</p>
+    <p><strong>Details:</strong> {{ order.details }}</p>
+</body>
+</html>

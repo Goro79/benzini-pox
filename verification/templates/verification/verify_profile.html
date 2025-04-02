@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Verify Profile</title>
+</head>
+<body>
+    <h1>Verify Profile for {{ verification.user.username }}</h1>
+    <p>Face Photo:</p>
+    {% if verification.face_photo %}
+        <img src="{{ verification.face_photo.url }}" alt="Face Photo" width="200">
+    {% else %}
+        <p>No face photo uploaded.</p>
+    {% endif %}
+    
+    <p>Passport Photo:</p>
+    {% if verification.passport_photo %}
+        <img src="{{ verification.passport_photo.url }}" alt="Passport Photo" width="200">
+    {% else %}
+        <p>No passport photo uploaded.</p>
+    {% endif %}
+    
+    <p>Permit File:</p>
+    {% if verification.permit_file %}
+        <a href="{{ verification.permit_file.url }}" target="_blank">View Permit</a>
+    {% else %}
+        <p>No permit file uploaded.</p>
+    {% endif %}
+    
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Mark as Verified</button>
+    </form>
+</body>
+</html>
